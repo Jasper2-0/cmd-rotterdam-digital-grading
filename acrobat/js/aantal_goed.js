@@ -1,1 +1,0 @@
-event.value = countLevel('g');
