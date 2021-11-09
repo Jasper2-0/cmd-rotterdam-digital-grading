@@ -1,36 +1,93 @@
 /**
  * the config object sets a number of configuration options for the document script
- * 
- *  
- * 
  */
-config = {};
+config = {
+    'fieldName' : "ovgu",
+    'o-strict' : true,
+    'single-o-grade' : 5,
+    'multiple-o-grade': 4,
+};
 
-config['fieldNames'] = "ovgu";
-config['o-strict'] = true;
-config['single-o-grade'] = 5;
-config['multiple-o-grade'] = 4;
+
  
 /**
- * 
+ * levels are the grading levels that are used in the evaluation.
  */
-ovgu = {};
+levels = {
+    'o' : {
+        'value' : 'Onvoldoende',
+        'weight' : 4,
+    },
+    'v' : {
+        'value' : 'Voldoende',
+        'weight': 6,
+    },
+    'g' : {
+        'value' : 'Goed',
+        'weight' : 8,
+    },
+    'u' : {
+        'value' : 'Uitstekend',
+        'weight' : 10,
+    }
+};
 
-ovgu['o'] = {};
-ovgu['o'].value = "Onvoldoende";
-ovgu['o'].weight = 4;
 
-ovgu['v'] = {};
-ovgu['v'].value = "Voldoende";
-ovgu['v'].weight = 6;
+/**
+ * 
+ * @param {*} levels 
+ */
+function setupGradeCalculator(levels) {
 
-ovgu['g'] = {};
-ovgu['g'].value = "Goed";
-ovgu['g'].weight = 8;
+    var fields = [];
+    /**
+     * total_score field holds the total score based on how the student scored on the different evaluation criteria
+     */
+    fields.push({
+        'name' : 'total_score',
+        'action' : 'Calculate',
+        'actionFunction' : 'calcTotalScore()'
+    });
+    /**
+    *  final_grade field holds the final grade that is calculated based on the evaluation.
+    */
+    fields.push({
+        'name' : 'final_grade',
+        'action' : 'Calculate',
+        'actionFunction' : 'calcFinalGrade()'
+    });
+    
+    var calculatorFields = [
+        {
+            'name' : 'count',
+            'action' : 'Calculate',
+            'actionFunction' : 'countLevel',
+        },{
+            'name' : 'score',
+            'action' : 'Calculate',
+            'actionFunction' : 'calcScore'
+        }
+    ]
 
-ovgu['u'] = {};
-ovgu['u'].value = "Uitstekend";
-ovgu['u'].weight = 10;
+    var level_keys = Object.keys(levels);
+
+    for (var i = 0; i < calculatorFields.length; i++) {
+        var field = calculatorFields[i];
+        for (var j = 0; j<level_keys.length;j++) {
+
+            fields.push({
+                'name': level_keys[j]+'_'+field.name,
+                'action': 'Calculate',
+                'actionFunction': "event.value = "+field.actionFunction+"('"+level_keys[j]+"')"
+            });
+        }
+    }
+
+    for (var i = 0; i < fields.length; i++) {
+        var currentField = this.getField(fields[i].name);
+        currentField.setAction(fields[i].action,fields[i].actionFunction);
+    }
+}
 
 /**
  * 
@@ -39,8 +96,8 @@ ovgu['u'].weight = 10;
  */
 function countRadioValues(v) {
 
-    var testValue = this.ovgu[v].value;
-    var groups = this.getField(config['fieldNames']);
+    var testValue = this.levels[v].value;
+    var groups = this.getField(config['fieldName']);
     var arr = groups.getArray();
     var cnt = 0;
     for (var i=0; i<arr.length; i++) {
@@ -98,19 +155,19 @@ function calcScore(value) {
  */
 function calcTotalScore() {
     
-    var levels = Object.keys(ovgu);
+    var levelKeys = Object.keys(levels);
     var score = 0;
 
-    for (var i = 0; i<levels.length;i++) {
-        score = score+calcScore(levels[i]);
+    for (var i = 0; i<levelKeys.length;i++) {
+        score = score+calcScore(levelKeys[i]);
     }
  
     if(config['o-strict']) {
         if(countRadioValues('o') == 1) {
-            score = config['single-o-grade']*countGroups(config['fieldNames']);
+            score = config['single-o-grade']*countGroups(config['fieldName']);
         }
         if(countRadioValues('o') > 1) {
-            score = config['multiple-o-grade']*countGroups(config['fieldNames']);
+            score = config['multiple-o-grade']*countGroups(config['fieldName']);
         }    
     }
 
@@ -126,13 +183,15 @@ function calcFinalGrade() {
  
     if(config['o-strict']) {
         if(countRadioValues('o') == 1) {
-            score = config['single-o-grade']*countGroups(config['fieldNames']);
+            score = config['single-o-grade']*countGroups(config['fieldName']);
         }
         if(countRadioValues('o') > 1) {
-            score = config['multiple-o-grade']*countGroups(config['fieldNames']);
+            score = config['multiple-o-grade']*countGroups(config['fieldName']);
         }    
     }
  
-    return score / countGroups(config['fieldNames']); 
+    return score / countGroups(config['fieldName']); 
 
 }
+
+setupGradeCalculator(levels);
