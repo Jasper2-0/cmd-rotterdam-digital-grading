@@ -3,7 +3,7 @@
  */
 config = {
     'fieldName' : "ovgu",
-    'o-strict' : true,
+    'o-strict' : false,
     'single-o-grade' : 5,
     'multiple-o-grade': 4,
 };
@@ -15,19 +15,19 @@ config = {
  */
 levels = {
     'o' : {
-        'value' : 'Onvoldoende',
+        'value' : 'onvoldoende',
         'weight' : 4,
     },
     'v' : {
-        'value' : 'Voldoende',
+        'value' : 'voldoende',
         'weight': 6,
     },
     'g' : {
-        'value' : 'Goed',
+        'value' : 'goed',
         'weight' : 8,
     },
     'u' : {
-        'value' : 'Uitstekend',
+        'value' : 'uitstekend',
         'weight' : 10,
     }
 };
@@ -46,7 +46,7 @@ function setupGradeCalculator(levels) {
     fields.push({
         'name' : 'total_score',
         'action' : 'Calculate',
-        'actionFunction' : 'calcTotalScore()'
+        'actionFunction' : 'event.value = calcTotalScore()'
     });
     /**
     *  final_grade field holds the final grade that is calculated based on the evaluation.
@@ -54,7 +54,7 @@ function setupGradeCalculator(levels) {
     fields.push({
         'name' : 'final_grade',
         'action' : 'Calculate',
-        'actionFunction' : 'calcFinalGrade()'
+        'actionFunction' : 'event.value =  calcFinalGrade()'
     });
     
     var calculatorFields = [
@@ -139,7 +139,7 @@ function countLevel(v) {
 function calcScore(value) {
 
     var count = countRadioValues(value);
-    var weight = ovgu[value].weight;
+    var weight = levels[value].weight;
     var score  = count*weight
 
     if(config['o-strict']) {
