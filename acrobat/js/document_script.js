@@ -46,7 +46,7 @@ function setupGradeCalculator(levels) {
     fields.push({
         'name' : 'total_score',
         'action' : 'Calculate',
-        'actionFunction' : 'calcTotalScore()'
+        'actionFunction' : 'event.value = calcTotalScore()'
     });
     /**
     *  final_grade field holds the final grade that is calculated based on the evaluation.
@@ -54,7 +54,7 @@ function setupGradeCalculator(levels) {
     fields.push({
         'name' : 'final_grade',
         'action' : 'Calculate',
-        'actionFunction' : 'calcFinalGrade()'
+        'actionFunction' : 'event.value = calcFinalGrade()'
     });
     
     var calculatorFields = [
@@ -139,7 +139,7 @@ function countLevel(v) {
 function calcScore(value) {
 
     var count = countRadioValues(value);
-    var weight = ovgu[value].weight;
+    var weight = levels[value].weight;
     var score  = count*weight
 
     if(config['o-strict']) {
