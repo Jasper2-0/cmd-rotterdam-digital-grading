@@ -3,7 +3,7 @@
  */
 config = {
     'fieldName' : "ovgu",
-    'o-strict' : true,
+    'o-strict' : false,
     'single-o-grade' : 5,
     'multiple-o-grade': 4,
 };
@@ -15,19 +15,19 @@ config = {
  */
 levels = {
     'o' : {
-        'value' : 'Onvoldoende',
+        'value' : 'onvoldoende',
         'weight' : 4,
     },
     'v' : {
-        'value' : 'Voldoende',
+        'value' : 'voldoende',
         'weight': 6,
     },
     'g' : {
-        'value' : 'Goed',
+        'value' : 'goed',
         'weight' : 8,
     },
     'u' : {
-        'value' : 'Uitstekend',
+        'value' : 'uitstekend',
         'weight' : 10,
     }
 };
