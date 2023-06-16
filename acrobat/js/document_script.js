@@ -7,8 +7,11 @@ config = {
     'single-o-grade' : 5,
     'multiple-o-grade': 4,
 };
+/**
+ * radioState is a global object for storing the state of the radiogroups when they're enabled / disabled.
+ */
 
-
+radioState = {};
  
 /**
  * levels are the grading levels that are used in the evaluation.
@@ -31,7 +34,6 @@ levels = {
         'weight' : 10,
     }
 };
-
 
 /**
  * 
@@ -193,5 +195,117 @@ function calcFinalGrade() {
     return score / countGroups(config['fieldName']); 
 
 }
+/**
+ * 
+ * @returns an array of all the fields that are of the type checkbox.
+ */
+function getCheckboxFields() {
+   
+    var checkboxFields = [];
+   
+    // iterate over all fields and if the type of the field is a checkbox, push in in the checkboxfields array.
+    for (var i = 0; i< this.numFields; i++) {
 
-setupGradeCalculator(levels);
+        var currentFieldName =  this.getNthFieldName(i);
+        var currentField = this.getField(currentFieldName);
+
+        if(currentField.type == "checkbox") {
+            checkboxFields.push(currentField);
+        }
+    }
+
+    return checkboxFields;
+}
+
+function countCheckboxBooleans() {
+
+    var checkboxFields = getCheckboxFields();
+    var checkboxBooleans = []
+
+    for (var i = 0; i<checkboxFields.length;i++) {
+        var currentField = checkboxFields[i];
+        switch (currentField.value) {
+            case "Yes":
+                checkboxBooleans.push(true);
+                break;
+            default:
+                checkboxBooleans.push(false);
+                break;
+        }
+    }
+
+    return allTrue(checkboxBooleans);
+}
+
+function allTrue(arr) {
+    for (var i = 0; i<arr.length;i++) {
+        if (arr[i] === false) {
+            return false
+        } 
+
+    }
+    return true;
+}
+
+function enableRadioGroups() {
+    // iterate over all radiogroups and enable them
+    var radioGroups = this.getField("ovgu").getArray()
+
+    for(var i = 0; i<radioGroups.length;i++) {
+        var currentField = radioGroups[i];
+        currentField.value = radioState[currentField.name];
+        currentField.readonly = false;
+    }
+
+}
+
+function disableRadioGroups() {
+    // iterate over all radiogroups and disable them
+    var radioGroups = this.getField("ovgu").getArray()
+
+    for(var i = 0; i<radioGroups.length;i++) {
+        var currentField = radioGroups[i];
+        radioState[currentField.name] = currentField.value;
+        currentField.readonly = true;
+    }
+}
+
+function setupCheckBoxes() {
+    var checkboxFields = getCheckboxFields()
+
+    // add action to checkboxes
+    for (var i = 0; i<checkboxFields.length;i++) {
+        checkboxFields[i].setAction("MouseUp","checkboxAction();")
+    }
+}
+
+function checkboxAction() {
+
+    var checkboxState = countCheckboxBooleans(getCheckboxFields()); 
+
+    if(checkboxState) {
+        enableRadioGroups();
+
+    } else {
+        disableRadioGroups();
+
+        // set all radiogroups to insufficient
+        var radioGroups = this.getField("ovgu").getArray();
+
+        for(var i = 0; i<radioGroups.length;i++) {
+            var currentField = radioGroups[i];
+            currentField.value = this.levels['o'].value;
+        }
+    }
+}
+
+function setupDocument() {
+    setupGradeCalculator(levels);
+
+    // if the document has checkboxes for 
+    if(getCheckboxFields() != []) {
+        setupCheckBoxes();
+    }
+
+}
+setupDocument();
