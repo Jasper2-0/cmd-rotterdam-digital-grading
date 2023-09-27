@@ -9,7 +9,7 @@ It relies on the following open source project(s)
 
 The basic workflows asumes the usage of the following tools:
 
-- Form Design | Adobe InDesign
+- Form Design | Adobe InDesign | Adobe Illustrator | Figma  
 - Interactive PDF Handling & Signing | Adobe Acrobat
 - Student Data Management | Microsoft Excel | LibreOffice | Google Spreadsheets
 - Bulk PDF Handling | BulkPDF 
